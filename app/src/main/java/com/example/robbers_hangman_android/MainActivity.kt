@@ -44,44 +44,32 @@ class MainActivity : ComponentActivity() {
             if (inputUser == "reveal") {
                 editTextOutput.setText("Help called. Word -> $wordNew")
             }
-            var inputChar = inputUser[0]
-            thisWord.revealLetter(inputChar)
-            guessLeft = thisWord.returnGuessLeft()
-            wordProg = thisWord.returnWordHidden()
-            containsUnderscore = wordProg.contains('_')
+            if (!inputUser.isNullOrEmpty()) {
+                editTextInput.text.clear()
+                var inputChar = inputUser[0]
+                thisWord.revealLetter(inputChar)
+                guessLeft = thisWord.returnGuessLeft()
+                wordProg = thisWord.returnWordHidden()
+                containsUnderscore = wordProg.contains('_')
 
-            editTextInput.text.clear()
-            editTextOutput.setText("Word: $wordProg \n\n\nGuesses left: $guessLeft \nGuess character...")
-            if (guessLeft == guessLeftInit - 1) {
-                imageView.setImageResource(R.drawable.hangman_1)
-            } else if (guessLeft == guessLeftInit - 2) {
-                imageView.setImageResource(R.drawable.hangman_2)
-            } else if (guessLeft == 0) {
-                imageView.setImageResource(R.drawable.hangman_3)
+                editTextOutput.setText("Word: $wordProg \n\n\nGuesses left: $guessLeft \nGuess character...")
+                if (guessLeft == guessLeftInit - 1 && containsUnderscore) {
+                    imageView.setImageResource(R.drawable.hangman_1)
+                } else if (guessLeft == guessLeftInit - 2 && containsUnderscore) {
+                    imageView.setImageResource(R.drawable.hangman_2)
+                } else if (guessLeft == 0 && containsUnderscore) {
+                    imageView.setImageResource(R.drawable.hangman_3)
+                    editTextOutput.setText("You lost! Big Ounce is dead :( The word was $wordNew")
+                } else if (!containsUnderscore) {
+                    editTextOutput.setText("You won! Big Ounce lives :) The word is $wordNew")
+                }
             }
         }
-
-
     }
     private fun getNewWord(): String {
         val randomIndex = Random.nextInt(wordList.size)
         return wordList[randomIndex]
     }
-}
-
-class Start {
-    private val wordList = WordList().wordList
-
-    fun start() {
-        val wordNew = getNewWord()
-        val thisWord = GuessWord(wordNew)
-        var guessLeft = thisWord.returnGuessLeft()
-    }
-    private fun getNewWord(): String {
-        val randomIndex = Random.nextInt(wordList.size)
-        return wordList[randomIndex]
-    }
-
 }
 
 class GuessWord(private val word: String) {
