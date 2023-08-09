@@ -6,15 +6,7 @@ import androidx.activity.ComponentActivity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.robbers_hangman_android.ui.theme.Robbers_hangman_androidTheme
+import android.os.Handler
 
 import kotlin.random.Random
 import kotlin.math.floor
@@ -28,6 +20,7 @@ class MainActivity : ComponentActivity() {
 
         val editTextInput = findViewById<EditText>(R.id.editText)
         val editTextOutput = findViewById<EditText>(R.id.editTextOutput)
+        val editTextOther = findViewById<EditText>(R.id.editTextOther)
         val submitButton = findViewById<Button>(R.id.submitButton)
         val imageView = findViewById<ImageView>(R.id.imageView)
         val wordNew = getNewWord()
@@ -36,13 +29,18 @@ class MainActivity : ComponentActivity() {
         val guessLeftInit = guessLeft
         var wordProg = thisWord.returnWordHidden()
         var containsUnderscore = wordProg.contains('_')
+        val handler = Handler()
 
-        editTextOutput.setText("Word: $wordNew Hidden word: $wordProg \n\n\nGuesses left: $guessLeft \nGuess character...")
+        editTextOutput.setText("Word: $wordProg \n\n\nGuesses left: $guessLeft \nGuess character...")
 
         submitButton.setOnClickListener {
             val inputUser = editTextInput.text.toString()
             if (inputUser == "reveal") {
-                editTextOutput.setText("Help called. Word -> $wordNew")
+                editTextOther.setText("Help called. Word -> $wordNew")
+                handler.postDelayed({
+                    editTextOther.setText("")
+                }, 1000)
+
             }
             if (!inputUser.isNullOrEmpty()) {
                 editTextInput.text.clear()
@@ -52,7 +50,7 @@ class MainActivity : ComponentActivity() {
                 wordProg = thisWord.returnWordHidden()
                 containsUnderscore = wordProg.contains('_')
 
-                editTextOutput.setText("Word: $wordProg \n\n\nGuesses left: $guessLeft \nGuess character...")
+                editTextOutput.setText("Word: $wordProg \nGuesses left: $guessLeft Guess character...")
                 if (guessLeft == guessLeftInit - 1 && containsUnderscore) {
                     imageView.setImageResource(R.drawable.hangman_1)
                 } else if (guessLeft == guessLeftInit - 2 && containsUnderscore) {
@@ -83,14 +81,10 @@ class GuessWord(private val word: String) {
         }
     }
     private val nbrLetters = uniqueChars.size
-    private var guessLeft =  floor(nbrLetters.toDouble() / 3).toInt() + 2
+    private var guessLeft =  floor(nbrLetters.toDouble() / 3).toInt() + 3
 
     fun returnGuessLeft(): Int {
         return guessLeft
-    }
-
-    fun wordinfo(): String {
-        return "Help called -> Word: $word Guesses left: $guessLeft"
     }
 
     fun revealLetter(letter: Char) {
